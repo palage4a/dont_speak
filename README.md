@@ -1,4 +1,5 @@
 # DONT SPEAK
+CLI personal assisten(will soon be)
 
 ## Как будет работать
 --
