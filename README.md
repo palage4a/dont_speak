@@ -27,6 +27,7 @@ See `entities.py` for more.
 
 **Soon**:
 - update entities
+- interactive adding entity: information about parent is displayed while updating ("editing message in chat"-like)
 - entities name suggestions
 
 **Not soon**:
