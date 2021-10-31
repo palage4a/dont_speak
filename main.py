@@ -10,7 +10,6 @@ hello_message ="-> "
 def hash(string):
     return sha1(bytes(string, 'utf-8')).hexdigest()
 
-# def add_to_database(name, type_, parent=None):
 def add_to_database(**kwargs):
     global database, history
     name = kwargs['name']

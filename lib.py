@@ -12,27 +12,26 @@ class Note:
 class Task:
     reminders = []
     notes = []
+    subtasks = []
 
-    def __init__(self,name, reminders = [] ):
+    def __init__(self, name, reminders = [] ):
         self.name = name
         for r in reminders:
             self.reminders.append(r)
 
 
-def need(name, reminders = []):
-    task = Task(name, reminders)
-    return task
+"""
+1 - name
+2 - reminder
+3 - note
+"""
+# def need(*args):
+#     while True:
+#         if len(args) == 0:
+#             name = input("how about name?")
+#             if name:
 
-def at(reminders, task):
-    reminders = []
 
-    reminders 
-    task = 
-    return 
-            )
-
-def note(text, task):
-    notes.append(
-            Note(text)
-            )
+# def at(reminders, task):
+# def note(text, task):
 

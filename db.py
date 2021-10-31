@@ -1,1 +1,16 @@
+import re
 database = {}
+
+def find_in_database(pattern):
+    words = re.split(r'\W+', pattern)
+    intersections = {}
+    for task in database.items():
+        for word in words:
+            if word in task['name']:
+                if task['id'] in intersections.keys():
+                    intersections[task['id']] = intersections[task['id']] + 1
+                else:
+                    intersections[task['id']] = 1
+    return intersections
+
+
