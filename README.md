@@ -23,7 +23,28 @@ See `entities.py` for more.
 - `добавить заметку "текст заметки":` в последнюю задачу с которой было взаимодействие добавляется заметка. Если было указаны ключевые слова для поиска: то в задачу, которая нашлась по ключевым словам. 
 - `создать подзадачу "название подзадачи"`: создает подзадачу
 
-## TODO:
+
+# TODO:
+- DSL
+  - examples:
+    ```bash
+    > `create task`
+    1) With name?
+    2) With description?
+    3) With deadline?
+    ...) With <property-name>?
+    > 1
+    Input name: test
+    1) With description?
+    2) With deadline?
+    ...) With <property-name>?
+    ... and so on
+    ```
+- JS GUI for MVP
+  - check [ D3 lib ](https://github.com/d3/d3) for mind-map UI
+    - note: useless [ zoom ](https://observablehq.com/@d3/smooth-zooming) in D3
+
+## ROADMAP:
 
 **Soon**:
 - update entities
@@ -34,6 +55,11 @@ See `entities.py` for more.
 - command suggestions
 - persistent storage
 - chatbot UI-like (buttons with commands name)
+- Mobile App
+
+**IDEAS**
+- button with name like "view my brain"
+  - mind-map-like view: button
 
 ## Done:
 - `add/create <type> <name>` : add entity to database and add link to current, if it exists

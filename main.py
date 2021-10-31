@@ -1,37 +1,23 @@
 from hashlib import sha1
-import json
-import uuid
 import re
 
-entity_types = (
-    'task',
-    'reminder',
-    'note',
-)
-
-
-create_cmds = (
-        'add',
-        'create'
-        )
-
-database = {
-}
-
-last_cmd = None
-
-history = []
+from db import database
+from history import history
 
 hello_message ="-> "
-
 
 # generate id
 def hash(string):
     return sha1(bytes(string, 'utf-8')).hexdigest()
 
-def add_to_database(name, type_, parent=None):
+# def add_to_database(name, type_, parent=None):
+def add_to_database(**kwargs):
     global database, history
+    name = kwargs['name']
+    entity_type = kwargs['type']
+    parent = kwargs['parent']
     entity_id = hash(name)
+
     entity = {
         'id': entity_id,
         'type': entity_type,
@@ -65,33 +51,10 @@ while True:
     user_input = input(hello_message)
     match = re.split(r"\W+", user_input)
 
+    from proc_tree import tree
     if match:
-        if match[0] == 'debug':
-            print('database:')
-            print(json.dumps(database, indent=4, sort_keys=True))
-            print('history:')
-            print(json.dumps(history, indent=4, sort_keys=True))
-
-        if match[0] == 'up':
-            if len(history) == 0:
-                print('already in air')
-            else:
-                history.pop()
-
-        if match[0] in create_cmds:
-            entity_type = match[1]
-            if entity_type not in entity_types:
-                print(f'warn: {entity_type} not allowed entity type')
-                continue
-
-            parent = None
-            if len(match) == 5 and match[3] in ['in', 'to']:
-                try:
-                    parent_id = hash(match[4])
-                    parent = database[parent_id]
-                except Exception as e:
-                    print('find parent err: ', err)
-
-            add_to_database(match[2], match[1], parent)
-
+        res = tree.process(0, match)
+        if not res:
+            continue
+        add_to_database(**res)
         update_hmsg()
