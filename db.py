@@ -1,6 +1,8 @@
 import re
+
 database = {}
 
+# TODO: explain what is and use it
 def find_in_database(pattern):
     words = re.split(r'\W+', pattern)
     intersections = {}
@@ -14,3 +16,8 @@ def find_in_database(pattern):
     return intersections
 
 
+
+def find_by_name(name):
+    for k, task in database.items():
+        if name in task['name']:
+            return task
