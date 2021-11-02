@@ -18,6 +18,9 @@ def find_in_database(pattern):
 
 
 def find_by_name(name):
-    for k, task in database.items():
+    if not name:
+        return None
+
+    for task in database.values():
         if name in task['name']:
             return task
