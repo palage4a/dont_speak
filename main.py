@@ -125,29 +125,31 @@ class Run:
     func: Callable
 
 
-while True:
-    # global hello_message
-    user_input = input(hello_message)
-    splitted = re.split(r"and|,", user_input)
-    have = []
-    for s in splitted:
-        for v in commands:
-            match = re.match(v.pattern, s)
-            if match:
-                have.append(
-                    Run(match, v.func)
-                )
-    
-    for h in have:
-        res = h.func(**h.match.groupdict())
-        if res:
-            add_to_database(**res)
-        hello_message = update_history(hello_message)
 
-    if len(have) == 0:
-        help_message = "Usage: "
-        for v in commands:
-            help_message = help_message + "\t" + v.get_usage() + "\n"
-        print(help_message)
+if __name__ == '__main__':
+    while True:
+        # global hello_message
+        user_input = input(hello_message)
+        splitted = re.split(r"and|,", user_input)
+        have = []
+        for s in splitted:
+            for v in commands:
+                match = re.match(v.pattern, s)
+                if match:
+                    have.append(
+                        Run(match, v.func)
+                    )
+        
+        for h in have:
+            res = h.func(**h.match.groupdict())
+            if res:
+                add_to_database(**res)
+            hello_message = update_history(hello_message)
+
+        if len(have) == 0:
+            help_message = "Usage: "
+            for v in commands:
+                help_message = help_message + "\t" + v.get_usage() + "\n"
+            print(help_message)
 
 
