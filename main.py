@@ -85,6 +85,14 @@ def note(text, parent_name=None):
         'entity_type': 'note',
         'parent': task
     }
+    
+def tag(name, parent_name=None):
+    task = find_by_name(parent_name)
+    return {
+        'name': name,
+        'entity_type': 'tag',
+        'parent': task,
+    }
 
 def debug(*args):
     print('database:', json.dumps(database, indent=4, sort_keys=True))
@@ -147,6 +155,8 @@ commands = [
     Command(r"\s*note '(?P<text>[^']+)'$", note, 'add note for current task'),
     Command(r"\s*remind about '(?P<parent_name>[^']+)' in '(?P<datetime>[^']+)'$", remind, 'create reminder for task'),
     Command(r"\s*note about '(?P<parent_name>[^']+)' '(?P<text>[^']+)'$", note, 'create note for task'),
+    Command(r"\s*mark as '(?P<name>[^']+)'$", tag, 'mark current task (tagging)'),
+    Command(r"\s*mark '(?P<parent_name>[^']+)' as '(?P<name>[^']+)'$", tag, 'mark task (tagging)'),
     Command(r"\s*back$", back, 'go to prev task in history'),
     Command(r"\s*debug$", debug, 'debug information'),
     Command(r"\s*tree$", tree, 'tree of subtasks of current task'),
