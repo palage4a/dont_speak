@@ -1,8 +1,10 @@
+from dataclasses import dataclass
 from hashlib import sha1
 import re
 import json
 import uuid
 from typing import Callable, Match
+from command import Command
 
 from db import database, find_by_name
 from history import history, update_history
@@ -16,8 +18,10 @@ def generate_id(string):
 
 def add_to_database(**kwargs):
     global database, history
+
     name = kwargs.get('name')
     text = kwargs.get('text')
+    datetime = kwargs.get('datetime')
     entity_type = kwargs['entity_type'] # required
     parent = kwargs.get('parent')
 
@@ -25,6 +29,7 @@ def add_to_database(**kwargs):
         'type': entity_type,
         'name': name,
         'text': text,
+        'datetime': datetime,
     }
 
     entity['id'] = generate_id(entity)
@@ -38,6 +43,7 @@ def add_to_database(**kwargs):
         if par_type not in parent:
             parent[par_type] = []
         parent[par_type].append(entity['id'])
+        entity['parent'] = parent['id']
 
     to_history = None
     if entity.get('type') == 'task':
@@ -55,26 +61,6 @@ def add_to_database(**kwargs):
 examples:
 need "buy bread" - create task 'buy bread'
 """
-from dataclasses import dataclass
-
-@dataclass
-class Command:
-    pattern: str
-    func: Callable
-    help_info: str
-
-    def get_usage_pattern(self):
-        p = re.sub(r"\(\?P", '', self.pattern)
-        #[^']+
-        second = re.sub(r"\[\^\'\]\+\)", '', p)
-        # .*
-        third = re.sub(r"\.\*", '', second)
-        fourh = re.sub(r"\\s\*", '', third)
-        res = re.sub(r"\$", '', fourh)
-        return res
-
-    def get_usage(self):
-        return self.get_usage_pattern() + ': ' + self.help_info 
 
 def create(name, parent_name=None):
     task = find_by_name(parent_name)
@@ -108,6 +94,52 @@ def back(*args):
     if len(history) > 0:
         history.pop()
 
+
+
+def traverse_task_tree(level, node, msg):
+    tasks = node.get('task')
+    if not tasks:
+        return msg
+        
+    for task_id in tasks:
+        task = database.get(task_id)
+        tabs = "\t" * level
+        msg = msg + f"\n{tabs} {task['name']}"
+        children = task.get('task')
+        if not children:
+            continue
+        if len(children) > 0:
+            msg = traverse_task_tree(level+1, task, msg)
+    return msg
+def full_tree():
+    return {
+            'name': 'hill', 
+            'task': [k for k, task in database.items() if not task.get('parent')],
+            }
+
+def tree(name=None):
+    if name:
+        if name == 'root':
+            print('you are king of the hill')
+            node = full_tree()
+        else:
+            node = find_by_name(name)
+            if not node:
+                print('i dont find task :(')
+                return
+    else:
+        node = history[-1] if len(history) > 0 else None
+    if not node:
+        print('you are king of the hill')
+        node = full_tree()
+    msg = f"{node['name']}"
+    msg = traverse_task_tree(1, node, msg)
+    print(msg)
+
+def root(*args):
+    while len(history) != 0:
+        history.pop()
+    
 commands = [
     Command(r"\s*need '(?P<name>[^']+)'$", create, 'create task or subtask for current task'),
     Command(r"\s*need '(?P<name>[^']+)' for '(?P<parent_name>[^']+)'$", create, 'create subtask'),
@@ -115,15 +147,17 @@ commands = [
     Command(r"\s*note '(?P<text>[^']+)'$", note, 'add note for current task'),
     Command(r"\s*remind about '(?P<parent_name>[^']+)' in '(?P<datetime>[^']+)'$", remind, 'create reminder for task'),
     Command(r"\s*note about '(?P<parent_name>[^']+)' '(?P<text>[^']+)'$", note, 'create note for task'),
-    Command(r"\s*back.*", back, 'go to prev task in history'),
-    Command(r"\s*debug.*", debug, 'debug information')
+    Command(r"\s*back$", back, 'go to prev task in history'),
+    Command(r"\s*debug$", debug, 'debug information'),
+    Command(r"\s*tree$", tree, 'tree of subtasks of current task'),
+    Command(r"\s*tree for '(?P<name>[^']+)'$", tree, 'tree of subtasks of specified task'),
+    Command(r"\s*root$", root, 'go to begin of task tree'),
 ]
 
 @dataclass
 class Run:
     match: Match
     func: Callable
-
 
 
 if __name__ == '__main__':
